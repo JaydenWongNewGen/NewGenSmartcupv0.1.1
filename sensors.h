@@ -1,0 +1,5 @@
+#include "src/touchsensor/CST816S.h"
+#include "src/flipsensor/QMI8658.h"
+#include "src/colordetection/ColorProcessor.h"
+#include "src/touchsensor/TouchManager.h"
+#include "src/flipsensor/FlipDetector.h"
