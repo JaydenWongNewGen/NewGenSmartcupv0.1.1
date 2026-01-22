@@ -45,7 +45,7 @@ CST816S::CST816S(int sda, int scl, int rst, int irq) {
   _scl = scl;
   _rst = rst;
   _irq = irq;
-
+  _event_available = false;
 }
 
 /*!

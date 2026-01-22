@@ -88,6 +88,16 @@ void updateBacklight() {
   }
 }
 
+void logTouchIfAny() {
+  if (touchManager.isTouched()) {
+    markInteraction();
+    Serial.printf("Touch: x=%u y=%u gesture=%s\n",
+                  touchManager.getTouchX(),
+                  touchManager.getTouchY(),
+                  touch.gesture().c_str());
+  }
+}
+
 // Button UI
 const int BTN_X = 20;
 const int BTN_Y = 100;
@@ -196,9 +206,7 @@ void setup() {
 void loop() {
   static int dotCount = 0;
   static unsigned long lastAnim = 0;
-  if (touchManager.isTouched()) {
-    markInteraction();
-  }
+  logTouchIfAny();
   switch (currentState) {
     case STATE_WAIT_FLIP:
       if (millis() - lastAnim > 500) {
