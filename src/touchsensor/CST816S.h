@@ -62,6 +62,7 @@ class CST816S {
     void sleep();
     bool available();
     bool probe();
+    bool poll();  // poll over I2C when IRQ isn't firing
     data_struct data;
     String gesture();
 

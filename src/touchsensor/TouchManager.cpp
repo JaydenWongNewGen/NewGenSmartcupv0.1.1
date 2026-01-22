@@ -23,7 +23,7 @@ void TouchManager::begin(TwoWire& bus) {
     }
 }
 bool TouchManager::isTouched() {
-    if (touch.available()) {
+    if (touch.available() || touch.poll()) {
         lastX = touch.data.x;
         lastY = touch.data.y;
         return true;

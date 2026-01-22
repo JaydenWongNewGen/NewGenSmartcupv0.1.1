@@ -108,6 +108,23 @@ bool CST816S::available() {
   return false;
 }
 
+bool CST816S::poll() {
+  byte data_raw[8] = {0};
+  if (i2c_read(CST816S_ADDRESS, 0x02, data_raw, 6) != 0) {
+    return false;
+  }
+  // points > 0 indicates at least one touch point present
+  if (data_raw[1] == 0) {
+    return false;
+  }
+  data.gestureID = data_raw[0];
+  data.points = data_raw[1];
+  data.event = data_raw[2] >> 6;
+  data.x = ((data_raw[2] & 0xF) << 8) + data_raw[3];
+  data.y = ((data_raw[4] & 0xF) << 8) + data_raw[5];
+  return true;
+}
+
 bool CST816S::probe() {
   uint8_t version = 0;
   return i2c_read(CST816S_ADDRESS, 0x15, &version, 1) == 0;
