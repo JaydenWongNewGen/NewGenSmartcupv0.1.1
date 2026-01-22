@@ -94,7 +94,7 @@ void logTouchIfAny() {
     Serial.printf("Touch: x=%u y=%u gesture=%s\n",
                   touchManager.getTouchX(),
                   touchManager.getTouchY(),
-                  touch.gesture().c_str());
+                  touchManager.getGestureName().c_str());
   }
 }
 

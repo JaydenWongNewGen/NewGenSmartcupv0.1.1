@@ -22,10 +22,39 @@ void TouchManager::begin(TwoWire& bus) {
         scanI2CBus(bus);
     }
 }
+
+static String deriveGesture(uint16_t prevX, uint16_t prevY, uint16_t x, uint16_t y, const String& rawGesture) {
+    const int threshold = 30;
+    int dx = (int)x - (int)prevX;
+    int dy = (int)y - (int)prevY;
+    if (abs(dx) > abs(dy) && abs(dx) > threshold) {
+        return dx > 0 ? "SWIPE RIGHT" : "SWIPE LEFT";
+    } else if (abs(dy) > threshold) {
+        return dy > 0 ? "SWIPE DOWN" : "SWIPE UP";
+    }
+    return rawGesture;
+}
+
 bool TouchManager::isTouched() {
-    if (touch.available() || touch.poll()) {
+    static unsigned long lastPollMs = 0;
+    bool got = false;
+
+    if (touch.available()) {
+        got = true;
+    } else {
+        unsigned long now = millis();
+        if (now - lastPollMs >= 50) {  // throttle polling to reduce I2C spam
+            got = touch.poll();
+            lastPollMs = now;
+        }
+    }
+
+    if (got) {
+        prevX = lastX;
+        prevY = lastY;
         lastX = touch.data.x;
         lastY = touch.data.y;
+        lastGestureName = deriveGesture(prevX, prevY, lastX, lastY, touch.gesture());
         return true;
     }
     return false;
