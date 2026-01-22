@@ -2,15 +2,26 @@
 
 TouchManager::TouchManager(CST816S& touchDriver) : touch(touchDriver) {}
 
-void TouchManager::begin() {
-    touch.begin(Wire, FALLING);
+static void scanI2CBus(TwoWire& bus) {
+    Serial.println("TouchManager: I2C scan start");
+    for (uint8_t addr = 1; addr < 0x7F; addr++) {
+        bus.beginTransmission(addr);
+        if (bus.endTransmission() == 0) {
+            Serial.printf("  found device at 0x%02X\n", addr);
+        }
+    }
+    Serial.println("TouchManager: I2C scan done");
+}
+
+void TouchManager::begin(TwoWire& bus) {
+    touch.begin(bus, FALLING);
     if (touch.probe()) {
         Serial.println("TouchManager: CST816S detected");
     } else {
         Serial.println("TouchManager: CST816S not responding (check I2C pins/address)");
+        scanI2CBus(bus);
     }
 }
-
 bool TouchManager::isTouched() {
     if (touch.available()) {
         lastX = touch.data.x;

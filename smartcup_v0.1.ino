@@ -126,7 +126,7 @@ void setup() {
   DEV_SET_PWM(BACKLIGHT_BRIGHT);
   markInteraction();
 
-  touchManager.begin();
+  touchManager.begin(IMUWire);
 
   if (!psramInit()) {
     Serial.println("PSRAM not available");

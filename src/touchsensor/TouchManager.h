@@ -12,7 +12,7 @@ class TouchManager {
 public:
     TouchManager(CST816S& touchDriver);
 
-    void begin();
+    void begin(TwoWire& bus);
     bool isTouched();
     bool isTouchInRegion(const TouchRegion& region);
     uint16_t getTouchX() const;
