@@ -98,6 +98,22 @@ void logTouchIfAny() {
   }
 }
 
+void handleUartCommands() {
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '1') {
+      Serial.println("UART: forcing analysis state");
+      showLogoWithLoading();
+      currentState = STATE_ANALYSIS;
+    } else if (c == '2') {
+      Serial.printf("UART: last touch x=%u y=%u gesture=%s\n",
+                    touchManager.getTouchX(),
+                    touchManager.getTouchY(),
+                    touchManager.getGestureName().c_str());
+    }
+  }
+}
+
 // Button UI
 const int BTN_X = 20;
 const int BTN_Y = 100;
@@ -118,6 +134,7 @@ void setup() {
 
   Wire.begin(21, 33);
   IMUWire.begin(6, 7);
+  IMUWire.setClock(100000);
   ble.begin();
   Wire.setClock(100000);
 
@@ -208,6 +225,7 @@ void setup() {
 void loop() {
   static int dotCount = 0;
   static unsigned long lastAnim = 0;
+  handleUartCommands();
   logTouchIfAny();
   switch (currentState) {
     case STATE_WAIT_FLIP:

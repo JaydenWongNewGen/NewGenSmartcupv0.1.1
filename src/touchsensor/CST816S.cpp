@@ -112,9 +112,12 @@ bool CST816S::available() {
 
 bool CST816S::poll() {
   byte data_raw[8] = {0};
+  static uint8_t failStreak = 0;
   if (i2c_read(_addr, 0x02, data_raw, 6) != 0) {
+    failStreak = min<uint8_t>(failStreak + 1, 10);
     return false;
   }
+  failStreak = 0;
   // points > 0 indicates at least one touch point present
   if (data_raw[1] == 0) {
     return false;
@@ -208,12 +211,12 @@ uint8_t CST816S::i2c_read(uint16_t addr, uint8_t reg_addr, uint8_t *reg_data, ui
   for (int attempt = 0; attempt < 3; attempt++) {
     _wire->beginTransmission(addr);
     _wire->write(reg_addr);
-    if (_wire->endTransmission(true) != 0) {
+    if (_wire->endTransmission(false) != 0) { // repeated start
       delay(5);
       continue;
     }
 
-    if (_wire->requestFrom(addr, length, true) != length) {
+    if (_wire->requestFrom((uint8_t)addr, (uint8_t)length, (uint8_t)true) != length) {
       delay(5);
       continue;
     }
