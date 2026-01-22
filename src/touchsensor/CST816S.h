@@ -28,7 +28,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define CST816S_ADDRESS     0x7E
+#define CST816S_ADDRESS     0x15
 
 enum GESTURE {
   NONE = 0x00,
@@ -61,6 +61,7 @@ class CST816S {
     void begin(TwoWire &wire, int interrupt = RISING);
     void sleep();
     bool available();
+    bool probe();
     data_struct data;
     String gesture();
 

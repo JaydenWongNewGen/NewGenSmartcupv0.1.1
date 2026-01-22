@@ -4,7 +4,11 @@ TouchManager::TouchManager(CST816S& touchDriver) : touch(touchDriver) {}
 
 void TouchManager::begin() {
     touch.begin(Wire, FALLING);
-    Serial.println("TouchManager initialized");
+    if (touch.probe()) {
+        Serial.println("TouchManager: CST816S detected");
+    } else {
+        Serial.println("TouchManager: CST816S not responding (check I2C pins/address)");
+    }
 }
 
 bool TouchManager::isTouched() {

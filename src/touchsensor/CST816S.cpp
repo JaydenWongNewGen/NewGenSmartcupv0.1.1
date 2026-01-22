@@ -79,7 +79,7 @@ void IRAM_ATTR CST816S::handleISR(void) {
 void CST816S::begin(TwoWire &wire, int interrupt) {
   _wire = &wire;
 
-  pinMode(_irq, INPUT);
+  pinMode(_irq, INPUT_PULLUP);
   pinMode(_rst, OUTPUT);
 
   digitalWrite(_rst, HIGH );
@@ -106,6 +106,11 @@ bool CST816S::available() {
     return true;
   }
   return false;
+}
+
+bool CST816S::probe() {
+  uint8_t version = 0;
+  return i2c_read(CST816S_ADDRESS, 0x15, &version, 1) == 0;
 }
 
 /*!
