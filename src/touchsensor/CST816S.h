@@ -63,6 +63,7 @@ class CST816S {
     bool available();
     bool probe();
     bool poll();  // poll over I2C when IRQ isn't firing
+    bool detectAddress();  // try common addresses
     data_struct data;
     String gesture();
 
@@ -73,6 +74,7 @@ class CST816S {
     int _scl;
     int _rst;
     int _irq;
+    uint8_t _addr = CST816S_ADDRESS;
     bool _event_available;
 
     void IRAM_ATTR handleISR();

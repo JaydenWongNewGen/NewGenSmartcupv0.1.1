@@ -15,7 +15,7 @@ static void scanI2CBus(TwoWire& bus) {
 
 void TouchManager::begin(TwoWire& bus) {
     touch.begin(bus, FALLING);
-    if (touch.probe()) {
+    if (touch.detectAddress() && touch.probe()) {
         Serial.println("TouchManager: CST816S detected");
     } else {
         Serial.println("TouchManager: CST816S not responding (check I2C pins/address)");

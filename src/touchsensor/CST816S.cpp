@@ -45,6 +45,7 @@ CST816S::CST816S(int sda, int scl, int rst, int irq) {
   _scl = scl;
   _rst = rst;
   _irq = irq;
+  _addr = CST816S_ADDRESS;
   _event_available = false;
 }
 
@@ -89,9 +90,10 @@ void CST816S::begin(TwoWire &wire, int interrupt) {
   digitalWrite(_rst, HIGH );
   delay(50);
 
-  i2c_read(CST816S_ADDRESS, 0x15, &data.version, 1);
+  detectAddress();
+  i2c_read(_addr, 0x15, &data.version, 1);
   delay(5);
-  i2c_read(CST816S_ADDRESS, 0xA7, data.versionInfo, 3);
+  i2c_read(_addr, 0xA7, data.versionInfo, 3);
 
   attachInterrupt(_irq, std::bind(&CST816S::handleISR, this), interrupt);
 }
@@ -110,7 +112,7 @@ bool CST816S::available() {
 
 bool CST816S::poll() {
   byte data_raw[8] = {0};
-  if (i2c_read(CST816S_ADDRESS, 0x02, data_raw, 6) != 0) {
+  if (i2c_read(_addr, 0x02, data_raw, 6) != 0) {
     return false;
   }
   // points > 0 indicates at least one touch point present
@@ -127,7 +129,20 @@ bool CST816S::poll() {
 
 bool CST816S::probe() {
   uint8_t version = 0;
-  return i2c_read(CST816S_ADDRESS, 0x15, &version, 1) == 0;
+  return i2c_read(_addr, 0x15, &version, 1) == 0;
+}
+
+bool CST816S::detectAddress() {
+  const uint8_t candidates[] = {0x15, 0x2E, 0x5A};
+  uint8_t version = 0;
+  for (uint8_t addr : candidates) {
+    if (i2c_read(addr, 0x15, &version, 1) == 0) {
+      _addr = addr;
+      return true;
+    }
+  }
+  // fallback: leave as default but report failure
+  return false;
 }
 
 /*!

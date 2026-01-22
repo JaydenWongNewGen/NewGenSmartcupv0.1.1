@@ -129,12 +129,14 @@ void setup() {
   touchManager.begin(IMUWire);
 
   if (!psramInit()) {
-    Serial.println("PSRAM not available");
-    while (1);
+    Serial.println("PSRAM not available, falling back to heap (reduced buffer reliability)");
   }
 
   // ✅ Allocate framebuffer after knowing NumPixels
   FrameBuffer = (UWORD*)ps_malloc(NumPixels * sizeof(UWORD));
+  if (!FrameBuffer) {
+    FrameBuffer = (UWORD*)malloc(NumPixels * sizeof(UWORD));
+  }
   if (!FrameBuffer) {
     Serial.println("FrameBuffer allocation failed!");
     while (1);
